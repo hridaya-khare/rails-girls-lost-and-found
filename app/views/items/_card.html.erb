@@ -1,0 +1,17 @@
+<%= link_to item, class: [ "card", ("card--returned" if item.resolved?) ], id: dom_id(item) do %>
+  <div class="card__media">
+    <%= item_visual item, "card__visual" %>
+    <%= status_badge item %>
+  </div>
+  <div class="card__body">
+    <h3 class="card__title"><%= item.title %></h3>
+    <p class="card__meta">
+      <span>📍 <%= item.location %></span>
+      <% if item.happened_on %><span>📅 <%= item.happened_on.to_fs(:short) %></span><% end %>
+    </p>
+    <div class="card__footer">
+      <span class="card__author"><%= avatar item.user, size: :xs %> <%= item.user.name %></span>
+      <span class="card__stats" title="Replies">💬 <%= item.comments.size %></span>
+    </div>
+  </div>
+<% end %>

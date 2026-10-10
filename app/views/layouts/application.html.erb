@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= [ content_for(:title), "Campus Lost & Found" ].compact.join(" · ") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="light dark">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <nav class="nav container">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand__mark" aria-hidden="true">🧭</span>
+          <span>Campus <em>Lost &amp; Found</em></span>
+        <% end %>
+
+        <div class="nav__actions">
+          <% if authenticated? %>
+            <%= link_to "Post an item", new_item_path, class: "btn btn--primary btn--sm" %>
+            <details class="menu">
+              <summary class="menu__trigger" aria-label="Account menu">
+                <%= avatar Current.user, size: :sm %>
+                <span class="menu__name">Hi, <%= Current.user.name.split.first %></span>
+              </summary>
+              <div class="menu__panel">
+                <p class="menu__email"><%= Current.user.email_address %></p>
+                <%= link_to "My items", items_path(status: "mine"), class: "menu__link" %>
+                <%= button_to "Sign out", session_path, method: :delete, class: "menu__link menu__link--danger" %>
+              </div>
+            </details>
+          <% else %>
+            <%= link_to "Sign in", new_session_path, class: "btn btn--ghost btn--sm" %>
+            <%= link_to "Sign up", new_registration_path, class: "btn btn--primary btn--sm" %>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <div class="flashes container" aria-live="polite">
+      <% flash.each do |type, message| %>
+        <div class="flash flash--<%= type %>" data-controller="flash" data-action="click->flash#dismiss">
+          <span><%= message %></span>
+          <button type="button" class="flash__close" aria-label="Dismiss">×</button>
+        </div>
+      <% end %>
+    </div>
+
+    <main class="container main">
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer container">
+      <p>Made with ❤️ at Rails Girls · Lost something? Someone on campus may have found it.</p>
+    </footer>
+  </body>
+</html>

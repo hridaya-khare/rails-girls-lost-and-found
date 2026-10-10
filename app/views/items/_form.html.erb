@@ -1,0 +1,71 @@
+<%= form_with model: item, class: "form" do |form| %>
+  <% if item.errors.any? %>
+    <div class="form-errors" role="alert">
+      <strong>Please fix <%= pluralize(item.errors.count, "problem") %>:</strong>
+      <ul>
+        <% item.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset class="field">
+    <legend class="field__label">Did you lose it or find it?</legend>
+    <div class="segmented">
+      <% Item::STATUSES.each do |status| %>
+        <%= form.radio_button :status, status, class: "segmented__input" %>
+        <%= form.label :status, (status == "lost" ? "😟 I lost it" : "🙌 I found it"), value: status, class: "segmented__option segmented__option--#{status}" %>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <%= form.label :title, "What is it?", class: "field__label" %>
+    <%= form.text_field :title, required: true, placeholder: "e.g. Blue water bottle", class: "input" %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= form.label :location, "Where?", class: "field__label" %>
+      <%= form.text_field :location, required: true, placeholder: "e.g. Library, 2nd floor", class: "input" %>
+    </div>
+    <div class="field">
+      <%= form.label :happened_on, "When?", class: "field__label" %>
+      <%= form.date_field :happened_on, max: Date.current, class: "input" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, class: "field__label" %>
+    <%= form.text_area :description, rows: 4, maxlength: 500, class: "input",
+          placeholder: "Colour, brand, stickers, anything that helps someone recognise it." %>
+    <span class="field__hint">Tip: for found items, keep one detail secret so you can check who the real owner is.</span>
+  </div>
+
+  <div class="field" data-controller="photo-preview">
+    <span class="field__label">Photo <span class="muted">(optional)</span></span>
+    <label class="dropzone">
+      <%= form.file_field :photo, accept: "image/jpeg,image/png,image/gif,image/webp", class: "sr-only",
+            data: { photo_preview_target: "input", action: "photo-preview#show" } %>
+      <% existing = item.photo.attached? && item.photo.persisted? %>
+      <%= image_tag (existing ? url_for(item.photo) : ""), alt: "", class: "dropzone__preview",
+            hidden: !existing, data: { photo_preview_target: "preview" } %>
+      <span class="dropzone__prompt" data-photo-preview-target="prompt" <%= "hidden" if existing %>>
+        <span class="dropzone__icon">📷</span>
+        <strong>Add a photo</strong>
+        <span class="muted">JPG, PNG, GIF or WebP · up to 5 MB</span>
+      </span>
+    </label>
+    <% if existing %>
+      <label class="checkbox">
+        <%= check_box_tag "item[remove_photo]", "1", false %> Remove current photo
+      </label>
+    <% end %>
+  </div>
+
+  <div class="form__actions">
+    <%= form.submit item.new_record? ? "Post item" : "Save changes", class: "btn btn--primary" %>
+    <%= link_to "Cancel", (item.new_record? ? items_path : item), class: "btn btn--ghost" %>
+  </div>
+<% end %>

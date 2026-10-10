@@ -1,0 +1,100 @@
+<% content_for :title, @item.title %>
+<% owner = authenticated? && @item.user == Current.user %>
+
+<%= link_to "← All items", items_path, class: "back-link" %>
+
+<article class="detail">
+  <div class="detail__media">
+    <%= item_visual @item, "detail__visual" %>
+  </div>
+
+  <div class="detail__info">
+    <div class="detail__badges">
+      <%= status_badge @item %>
+      <% if @item.resolved? %><span class="badge badge--<%= @item.status %>"><%= @item.status.capitalize %></span><% end %>
+    </div>
+    <h1 class="detail__title"><%= @item.title %></h1>
+
+    <dl class="facts">
+      <div><dt>📍 Where</dt><dd><%= @item.location %></dd></div>
+      <% if @item.happened_on %>
+        <div><dt>📅 When</dt><dd><%= @item.happened_on.to_fs(:long) %></dd></div>
+      <% end %>
+      <div><dt>🕒 Posted</dt><dd><%= time_ago_in_words(@item.created_at) %> ago</dd></div>
+    </dl>
+
+    <% if @item.description.present? %>
+      <div class="detail__description"><%= simple_format @item.description %></div>
+    <% end %>
+
+    <div class="poster">
+      <%= avatar @item.user %>
+      <div>
+        <span class="poster__label"><%= @item.lost? ? "Lost by" : "Found by" %></span>
+        <strong><%= @item.user.name %></strong>
+      </div>
+    </div>
+
+    <% if @item.resolved? %>
+      <div class="returned-banner">✅ Returned to its owner. Case closed!</div>
+    <% end %>
+
+    <% if owner %>
+      <div class="owner-actions">
+        <% if @item.resolved? %>
+          <%= button_to "↩︎ Undo: not returned yet", item_path(@item), method: :patch,
+                params: { item: { resolved: false } }, class: "btn btn--ghost" %>
+        <% else %>
+          <%= button_to "✅ Mark as returned", item_path(@item), method: :patch,
+                params: { item: { resolved: true } }, class: "btn btn--found",
+                form: { data: { turbo_confirm: "Has this item been returned to its owner?" } } %>
+        <% end %>
+        <%= link_to "Edit", edit_item_path(@item), class: "btn btn--ghost" %>
+        <%= button_to "Delete", item_path(@item), method: :delete, class: "btn btn--danger-ghost",
+              form: { data: { turbo_confirm: "Delete this item? This can't be undone." } } %>
+      </div>
+    <% end %>
+  </div>
+</article>
+
+<section class="replies" id="replies">
+  <h2>Replies <span class="replies__count"><%= @comments.size %></span></h2>
+
+  <% if @comments.any? %>
+    <ol class="thread">
+      <% @comments.each do |comment| %>
+        <li class="reply <%= "reply--owner" if comment.user == @item.user %>" id="<%= dom_id(comment) %>">
+          <%= avatar comment.user %>
+          <div class="reply__bubble">
+            <div class="reply__head">
+              <strong><%= comment.user.name %></strong>
+              <% if comment.user == @item.user %><span class="reply__tag">Poster</span><% end %>
+              <time datetime="<%= comment.created_at.iso8601 %>"><%= time_ago_in_words(comment.created_at) %> ago</time>
+              <% if authenticated? && (comment.user == Current.user || owner) %>
+                <%= button_to "Delete", item_comment_path(@item, comment), method: :delete, class: "reply__delete",
+                      form: { data: { turbo_confirm: "Delete this reply?" } } %>
+              <% end %>
+            </div>
+            <%= simple_format comment.body, class: "reply__body" %>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="muted">No replies yet. <%= @item.lost? ? "Seen it somewhere? Let them know!" : "Is it yours? Say so below!" %></p>
+  <% end %>
+
+  <% if authenticated? %>
+    <%= form_with model: [ @item, @comment ], class: "reply-form" do |form| %>
+      <%= avatar Current.user %>
+      <div class="reply-form__box">
+        <%= form.label :body, "Write a reply", class: "sr-only" %>
+        <%= form.text_area :body, rows: 3, required: true, maxlength: 1000,
+              placeholder: @item.lost? ? "I think I saw it near…" : "I think that's mine! It has…" %>
+        <%= form.submit "Post reply", class: "btn btn--primary btn--sm" %>
+      </div>
+    <% end %>
+  <% else %>
+    <p class="signin-prompt"><%= link_to "Sign in", new_session_path %> or <%= link_to "sign up", new_registration_path %> to reply.</p>
+  <% end %>
+</section>

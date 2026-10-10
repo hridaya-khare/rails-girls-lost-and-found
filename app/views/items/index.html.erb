@@ -1,0 +1,45 @@
+<% content_for :title, "Browse items" %>
+
+<section class="hero">
+  <div class="hero__text">
+    <p class="eyebrow">Campus Lost &amp; Found</p>
+    <h1>Lost something? <span class="hero__accent">Found something?</span></h1>
+    <p class="lead">Post it here and help your fellow students get their things back.</p>
+    <div class="hero__cta">
+      <%= link_to "😟 I lost something", new_item_path(status: "lost"), class: "btn btn--lost" %>
+      <%= link_to "🙌 I found something", new_item_path(status: "found"), class: "btn btn--found" %>
+    </div>
+  </div>
+  <dl class="stats">
+    <div class="stat stat--lost"><dt>Still lost</dt><dd><%= @counts[:lost] %></dd></div>
+    <div class="stat stat--found"><dt>Waiting for owners</dt><dd><%= @counts[:found] %></dd></div>
+    <div class="stat stat--returned"><dt>Happily returned</dt><dd><%= @counts[:returned] %></dd></div>
+  </dl>
+</section>
+
+<section class="toolbar">
+  <nav class="chips" aria-label="Filter items">
+    <%= filter_link "All", nil %>
+    <%= filter_link "Lost", "lost", @counts[:lost] %>
+    <%= filter_link "Found", "found", @counts[:found] %>
+    <%= filter_link "Returned", "returned", @counts[:returned] %>
+    <% if authenticated? %><%= filter_link "My items", "mine" %><% end %>
+  </nav>
+  <%= form_with url: items_path, method: :get, class: "search", role: "search" do |form| %>
+    <%= form.hidden_field :status, value: params[:status] if params[:status].present? %>
+    <%= form.search_field :q, value: params[:q], placeholder: "Search bottles, keys, the library…", class: "search__input", aria: { label: "Search items" } %>
+  <% end %>
+</section>
+
+<% if @items.any? %>
+  <div class="grid">
+    <%= render partial: "card", collection: @items, as: :item %>
+  </div>
+<% else %>
+  <div class="empty">
+    <div class="empty__icon">🔍</div>
+    <h2>Nothing here yet</h2>
+    <p><%= params[:q].present? ? "No items match “#{params[:q]}”." : "No items in this list. Be the first to post one!" %></p>
+    <%= link_to "Post an item", new_item_path, class: "btn btn--primary" %>
+  </div>
+<% end %>

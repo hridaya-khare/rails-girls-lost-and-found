@@ -1,0 +1,7 @@
+<% content_for :title, "Edit #{@item.title}" %>
+
+<div class="form-page">
+  <%= link_to "← Back to item", @item, class: "back-link" %>
+  <h1>Edit item</h1>
+  <%= render "form", item: @item %>
+</div>
