@@ -63,4 +63,4 @@ group :test do
 end
 
 # json 3.x drops the quirks_mode option that ActiveSupport 8.0 passes when encoding cookies
-gem "json", "< 3.0"
+gem "json", "< 4.0"
