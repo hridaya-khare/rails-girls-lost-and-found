@@ -7,14 +7,15 @@ A modern, community-driven web application to report, browse, and recover lost a
 ## 👥 Mentors & Team
 
 ### 🎓 Mentors
-- [Mentor Name 1]
-- [Mentor Name 2]
+- Ankit Shukla
+- Harshada Gujar
 
 ### 💻 Team Members
-- [Teammate Name 1]
-- [Teammate Name 2]
-- [Teammate Name 3]
-- [Teammate Name 4]
+- Hridaya Khare
+- Prutha Joshi
+- Diksha A.
+- Diksha Veer
+- Mohammad Zeeshan Inamdar
 
 ---
 
