@@ -3,8 +3,8 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # Secret key base for encrypted cookies and sessions
-  config.secret_key_base = ENV["SECRET_KEY_BASE"]
+  # Secret key base for encrypted cookies and sessions (with fallback for asset precompilation)
+  config.secret_key_base = ENV["SECRET_KEY_BASE"] || (ENV["SECRET_KEY_BASE_DUMMY"] ? "dummy_secret_key_base_for_assets_precompilation_only" : nil)
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
