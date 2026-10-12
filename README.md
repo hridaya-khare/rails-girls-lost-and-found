@@ -9,8 +9,8 @@ Currently Running Here: https://rails-girls-lost-and-found-whfw.onrender.com/
 ## 👥 Mentors & Team
 
 ### 🎓 Mentors
-- Ankit Shukla
 - Harshada Gujar
+- Ankit Shukla
 
 ### 💻 Team Members
 - Hridaya Khare
